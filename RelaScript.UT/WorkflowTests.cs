@@ -326,7 +326,7 @@ namespace RelaScript.UT
             Expression e3 = Expression.NewArrayInit(typeof(object), e2);
             Expression e4 = Expression.Convert(e3, typeof(object));
 
-            Func<object[],double> r1 = Expression.Lambda<Func<object[], double>>(e1, p).Compile();
+            Func<object[], double> r1 = Expression.Lambda<Func<object[], double>>(e1, p).Compile();
             Func<object[], object> r2 = Expression.Lambda<Func<object[], object>>(e2, p).Compile();
             Func<object[], object[]> r3 = Expression.Lambda<Func<object[], object[]>>(e3, p).Compile();
             Func<object[], object> r4 = Expression.Lambda<Func<object[], object>>(e4, p).Compile();
@@ -391,7 +391,7 @@ namespace RelaScript.UT
             );
         }
 
-        [TestMethod] 
+        [TestMethod]
         public void SimpleWhileTest()
         {
             string line = "f:newvar(v:iterator, 1);"
@@ -406,7 +406,7 @@ namespace RelaScript.UT
             for (int i = 1; i <= 100; i++)
                 expected *= 1.0135;
 
-            TestScaffold.TestLines(lines: new List<string>() { line }, 
+            TestScaffold.TestLines(lines: new List<string>() { line },
                 expected: new List<object>() { expected });
         }
 
@@ -438,7 +438,7 @@ namespace RelaScript.UT
                     "f:fizzbuzz(5)",
                     "f:fizzbuzz(11)",
                     "f:fizzbuzz(15)"
-                }, 
+                },
                 expected: new List<object>()
                 {
                     0.0,
@@ -572,6 +572,32 @@ namespace RelaScript.UT
                 new InputVar("v:a", 10.0),
                 new InputVar("v:b", 30.0),
                 new InputVar("v:c", 35.0)
+            });
+        }
+
+        [TestMethod]
+        public void TwoTiminTest()
+        {
+            TestScaffold.TestLinesAndElideSemicolons(
+            lines: new List<string>()
+            {
+                "f:twotimin := {\r\n" +
+                "    a:0 * a:0\r\n" +
+                "    ,\r\n" +
+                "    if (a:0 < 10) { a:0 * 2 } else { a:0 / 2 }\r\n" +
+                "}\r\n" +
+                "\r\n" +
+                "f:twotimin(3)[0]//-- > (9, 6)",
+                "f:twotimin(3)[1]",
+                "f:twotimin(12)[0]//-- > (144, 6)",
+                "f:twotimin(12)[1]"
+            },
+            expected: new List<object>()
+            {
+                9.0,
+                6.0,
+                144.0,
+                6.0
             });
         }
     }
