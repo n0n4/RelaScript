@@ -1,0 +1,146 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Rela Script",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#singlestrings"
+		},
+		{
+			"include": "#args"
+		},
+		{
+			"include": "#variables"
+		},
+		{
+			"include": "#functions"
+		},
+		{
+			"include": "#defns"
+		},
+		{
+			"include": "#objects"
+		},
+		{
+			"include": "#libs"
+		},
+		{
+			"include": "#casts"
+		},
+		{
+			"include": "#bools"
+		},
+		{
+			"include": "#numbers"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.rela",
+				"match": "\\b(f\\:if|f\\:ifelse|f\\:while|f\\:for|f\\:return|f\\:import|if|else|while|for|return|defn|object|import|anon|free)\\b"
+			},
+			{
+				"name": "keyword.operator.rela",
+				"match": "\\b(\\=\\=|\\<\\=|\\>\\=|\\!\\=|\\&\\&|\\|\\||\\+|\\-|\\^|\\/|\\*|\\%|\\!|\\=|\\>|\\<|\\||\\&)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.rela",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.rela",
+					"match": "\\\\."
+				}
+			]
+		},
+		"singlestrings": {
+			"name": "string.quoted.single.rela",
+			"begin": "'",
+			"end": "'",
+			"patterns": [
+				{
+					"name": "constant.character.escape.rela",
+					"match": "\\\\."
+				}
+			]
+		},
+		"args": {
+			"patterns": [{
+				"name": "variable.language.rela",
+				"match": "\\b(a\\:\\w+)\\b"
+			}]
+		},
+		"variables": {
+			"patterns": [{
+				"name": "variable.parameter.rela",
+				"match": "\\b(v\\:\\w+)\\b"
+			}]
+		},
+		"functions": {
+			"patterns": [{
+				"name": "entity.name.function.rela",
+				"match": "\\b(f\\:\\w+)\\b"
+			}]
+		},
+		"defns": {
+			"patterns": [{
+				"name": "entity.name.class.rela",
+				"match": "\\b(d\\:\\w+)\\b"
+			}]
+		},
+		"objects": {
+			"patterns": [{
+				"name": "variable.other.object.rela",
+				"match": "\\b(o\\:\\w+)\\b"
+			}]
+		},
+		"libs": {
+			"patterns": [{
+				"name": "entity.name.class.rela",
+				"match": "\\b(l\\:\\w+)\\b"
+			}]
+		},
+		"casts": {
+			"patterns": [{
+				"name": "entity.name.type.rela",
+				"match": "\\b(c\\:\\w+)\\b"
+			}]
+		},
+		"bools": {
+			"patterns": [{
+				"name": "constant.language.rela",
+				"match": "\\b(b\\:\\w+)\\b"
+			}]
+		},
+		"numbers": {
+			"patterns": [{
+				"name": "constant.numeric.rela",
+				"match": "\\b(\\-\\d+\\.\\d+|\\d+\\.\\d+|\\d+|\\-\\d+)\\b"
+			}]
+		},
+		"comments": {
+			"patterns": [{
+				"begin": "//",
+				"beginCaptures": {
+					"0": {
+						"name": "punctuation.definition.comment.rela"
+					}
+				},
+				"end": "$",
+				"name": "comment.line.double-slash.rela"
+			}]
+		}
+	},
+	"scopeName": "source.rela"
+}
