@@ -136,6 +136,21 @@ namespace RelaScript.UT
             );
         }
 
+        [TestMethod]
+        public void BackToBackScopeTest()
+        {
+            TestScaffold.TestLines(
+                lines: new List<string>()
+                {
+                    "{0}{1}"
+                },
+                expected: new List<object>()
+                {
+                    1.0
+                }
+            );
+        }
+
         // Note on following tests:
         // current deciding that functions must be accessed via ()
         // and not supporting e.g. f:sin{3} (would be f:sin({3})
