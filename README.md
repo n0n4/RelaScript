@@ -21,8 +21,46 @@ A scripting language for .NET, compiled with expression trees for high performan
 - Function Loose: funcs can be re-defined.
 - Array Loose: anything can be made into an array by inserting commas.
 
-(WIP: getting started instructions to come)
+# Getting Setup
+Reference RelaScript in your project. RelaScript is built against .NET Standard 1.1, so it is compatible with .NET Core 1.0 and up, and .NET Framework 4.5 and up. Then, create an InputContext to run RelaScript within:
+```csharp
+InputContext context = new InputContext();
 
-(WIP: installing vscode extension instructions to come)
+// random must be provided if you want to use functions that require random numbers
+context.Random = new RandomBasic(0); // replace 0 with your random seed
+
+// load library providers-- this controls what libraries may be imported into scripts
+// you may write your own libraries to allow RelaScript to interface with your project
+context.LibraryProviders.Add(new LibraryProviderBasic());
+```
+Once an InputContext is set up, you may load and execute scripts:
+```csharp
+string scriptText = "a:0 * 2"; // load your script
+
+// an Exline represents a script file
+Exline exscript = new Exline(scriptText);
+
+// the Exline must be compiled before it can be run
+context.CompileLine(exscript);
+
+// args are passed into the script upon execution
+object[] args = new object[] { 2.0 };
+
+object result = exscript.Execute(args);
+// result --> 4.0 (double)
+```
+
+# Writing RelaScript
+RelaScript files are saved with the .rela extension. If you install our VSCode extension, you can edit these files in VSCode with proper syntax highlighting. To do so, simply copy the RelaScript.VSCExtension folder in this project to your <user>/.vscode/extensions folder.
+  
+# TODO
+- Still missing a few crucial array support features, like index assignment (`v:arr[1] = 5`) and a make-function (`f:array(10)`)
+- The basic libraries are missing many essential functions
+- Support for writing libraries in RelaScript is incomplete
+- The compiler needs to output more descriptive errors
+- Type safety mechanics are under consideration
+
 
 (WIP: samples to come)
+
+(WIP: notable TODOs / gaps)
