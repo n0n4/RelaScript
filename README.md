@@ -51,7 +51,7 @@ object result = exscript.Execute(args);
 ```
 
 # Writing RelaScript
-RelaScript files are saved with the .rela extensnion. If you install our VSCode extension, you can edit these files in VSCode with proper syntax highlighting. To do so, simply copy the RelaScript.VSCExtension folder in this project to your <user>/.vscode/extensions folder.
+RelaScript files are saved with the .rela extension. If you install our VSCode extension, you can edit these files in VSCode with proper syntax highlighting. To do so, simply copy the RelaScript.VSCExtension folder in this project to your <user>/.vscode/extensions folder.
   
 # TODO
 - Still missing a few crucial array support features, like index assignment (`v:arr[1] = 5`) and a make-function (`f:array(10)`)
