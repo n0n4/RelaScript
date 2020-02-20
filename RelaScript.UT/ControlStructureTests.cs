@@ -61,8 +61,8 @@ namespace RelaScript.UT
                 expected: new List<object>()
                 {
                     10.0,
-                    0,
-                    0,
+                    0.0,
+                    0.0,
                     10.0
                 }
             );
@@ -82,8 +82,8 @@ namespace RelaScript.UT
                 expected: new List<object>()
                 {
                     10.0,
-                    0,
-                    0,
+                    0.0,
+                    0.0,
                     10.0
                 }
             );

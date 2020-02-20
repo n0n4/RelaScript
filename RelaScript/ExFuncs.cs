@@ -15,7 +15,8 @@ namespace RelaScript
             "f:while", "f:for", "f:if",
             "f:newfunc", "f:setfunc", "f:newvar", "f:setvar", "f:getvar", "f:import",
             "f:sin",
-            "f:random", "f:randomint", "f:roll"
+            "f:random", "f:randomint", "f:roll",
+            "f:array"
         };
 
         public static Expression GetFunctionExpression(Expression funcexp, Expression argexp,
@@ -99,49 +100,32 @@ namespace RelaScript
                         GetArgAsString(GetArgIndex(argexp, 1)),
                         Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext)));*/
                 case "f:while":
-                    // TODO: remove these comments...
-                    // always returns 0
-                    //RuntimeVariablesExpression whileruntimevars = Expression.RuntimeVariables(
-                    //    Expression.Variable(typeof(object[]), "whileargsparam"));
-                    // whileruntimevars.Variables[0]
-
-                    // a breakdown of the issue:
-                    // every time we reference the full arguments, the whole thing is executed
-                    // this means that the "then" part of the if is ALWAYS executed
-                    // when we access the condition, the THEN is executed as well
-
-                    // how can we avoid this???
-
-                    // could we like... wrap the args in an ifthenelse that is always false so
-                    // it doesn't execute upon assignment... and then access the then element directly?
-                    // uhhh idk
-
-                    // test with GetArgIndexUnbox
+                    ParameterExpression whileresult = Expression.Parameter(typeof(object), "whileresult");
                     LabelTarget breaklabel = Expression.Label("WhileBreak");
+                    return Expression.Block(
+                        new[] { whileresult },
+                        Expression.Assign(whileresult, 
+                            Expression.Convert(Expression.Constant(0), typeof(object))),
+                        Expression.Loop(
+                            Expression.IfThenElse(
+                                GetArgAsBool(GetArgIndexUnbox(argexp, 0)),
+                                Expression.Assign(whileresult,
+                                    Expression.Convert(GetArgIndexUnbox(argexp, 1), typeof(object))),
+                                Expression.Break(breaklabel, whileresult)
+                                ),
+                            breaklabel
+                            ),
+                        whileresult
+                        );
+
+                    // TODO: evaluate performance loss of the above version vs this...
+                    // old version that returns 0 always:
+                    /*LabelTarget breaklabel = Expression.Label("WhileBreak");
                     return Expression.Block(
                         Expression.Loop(
                             Expression.IfThenElse(
                                 GetArgAsBool(GetArgIndexUnbox(argexp, 0)),
                                 GetArgIndexUnbox(argexp, 1),
-                                Expression.Break(breaklabel)
-                                ),
-                            breaklabel
-                            ),
-                        Expression.Constant(0)
-                        );
-                    // unused prototype
-                    // TODO: remove this once no longer needed 
-                    /*ParameterExpression whileargsparam = Expression.Variable(typeof(object[]), "whileargsparam");
-                    LabelTarget breaklabel = Expression.Label("WhileBreak");
-                    return Expression.Block(
-                        new[] { whileargsparam },
-                        //whileruntimevars,
-                        Expression.Assign(whileargsparam, argexp),
-                        Expression.Loop(
-                            Expression.IfThenElse(
-                                GetArgAsBool(GetArgIndex(whileargsparam, 0)),
-                                Expression.Assign(whileargsparam, argexp), // reassign, forcing re-execute
-                                //GetArgIndex(whileargsparam, 1),
                                 Expression.Break(breaklabel)
                                 ),
                             breaklabel
@@ -182,7 +166,7 @@ namespace RelaScript
                         Expression.IfThenElse(
                             GetArgAsBool(GetArgIndex(argexp, 0)),
                             Expression.Assign(ifresult, GetArgAsObject(GetArgIndex(argexp, 1))),
-                            Expression.Assign(ifresult, GetArgAsObject(Expression.Constant(0)))),
+                            Expression.Assign(ifresult, GetArgAsObject(Expression.Constant(0.0)))),
                         ifresult);
                 case "f:ifelse":
                     ParameterExpression ifelseresult = Expression.Parameter(typeof(object), "ifelseresult");
@@ -311,6 +295,9 @@ namespace RelaScript
                         GetArgAsInt(GetArgIndex(argexp, 0)),
                         GetArgAsInt(GetArgIndex(argexp, 1)),
                         GetRandomArg(Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext))));
+                case "f:array":
+                    return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("Array"),
+                        ExCasts.WrapArguments(argexp));
                 default:
                     // we didn't recognize the function, we should check if it's part of the 
                     // custom defined functions dictionary
@@ -608,6 +595,73 @@ namespace RelaScript
             for (int i = 0; i < dice; i++)
                 sum += random.RandomInt(1, sides);
             return sum;
+        }
+
+        public static object[] Array(object[] args)
+        {
+            if (args[0] is double)
+                args[0] = (int)((double)args[0]);
+            if(args[0] is int)
+            {
+                int size = (int)args[0];
+                object[] arr = new object[size];
+                if(args.Length > 1)
+                {
+                    for (int i = 0; i < size; i++)
+                        arr[i] = args[1];
+                }
+                return arr;
+            }
+            else if(args[0] is object[])
+            {
+                object[] sizes = (object[])args[0];
+                if (sizes[0] is double)
+                    sizes[0] = (int)((double)sizes[0]);
+                int size = (int)sizes[0];
+                object[] arr = new object[size];
+                if (args.Length > 1)
+                {
+                    for (int i = 0; i < size; i++)
+                        arr[i] = ArrayRecurse(sizes, 1);
+                }
+                else
+                {
+                    for (int i = 0; i < size; i++)
+                        arr[i] = ArrayRecurseDefault(sizes, args[1], 1);
+                }
+                return arr;
+            }
+            throw new Exception("Array creation failed because type of sizes was not recognized");
+        }
+
+        private static object ArrayRecurse(object[] sizes, int sizeindex)
+        {
+            if (sizes.Length <= sizeindex)
+                return 0;
+
+            if (sizes[sizeindex] is double)
+                sizes[sizeindex] = (int)((double)sizes[sizeindex]);
+            int size = (int)sizes[sizeindex];
+            sizeindex++;
+            object[] arr = new object[size];
+            for (int i = 0; i < size; i++)
+                arr[i] = ArrayRecurse(sizes, sizeindex);
+            return arr;
+        }
+
+        private static object ArrayRecurseDefault(object[] sizes, object def, int sizeindex)
+        {
+            if (sizes.Length <= sizeindex)
+                return def;
+
+            if (sizes[sizeindex] is double)
+                sizes[sizeindex] = (int)((double)sizes[sizeindex]);
+            int size = (int)sizes[sizeindex];
+            sizeindex++;
+            object[] arr = new object[size];
+            for (int i = 0; i < size; i++)
+                arr[i] = ArrayRecurseDefault(sizes, def, sizeindex);
+            return arr;
         }
     }
 }
