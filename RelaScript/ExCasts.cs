@@ -67,7 +67,8 @@ namespace RelaScript
             else if (args.Type == typeof(object[]))
                 return args;
             else if (args.Type == typeof(InputVar))
-                return Expression.NewArrayInit(typeof(object), Expression.Field(args, "Value"));
+                return WrapArguments(Expression.Field(args, "Value"));
+            //return Expression.NewArrayInit(typeof(object), Expression.Field(args, "Value"));
             else if (args.Type == typeof(AccessorResult))
                 return Expression.NewArrayInit(typeof(object), Expression.Convert(args, typeof(object)));
             else if (args.Type == typeof(object))

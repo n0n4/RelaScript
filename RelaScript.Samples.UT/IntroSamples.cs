@@ -487,5 +487,177 @@ namespace RelaScript.Samples.UT
                 0.0
             });
         }
+
+        [TestMethod]
+        public void StringExample()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:special := \"lobster ravioli\"\r\n" +
+                "v:dessert := 'burnt sage ice cream'"
+            },
+            expected: new List<object>()
+            {
+                new InputVar("v:dessert", "burnt sage ice cream")
+            });
+        }
+
+        [TestMethod]
+        public void StringAddition()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:groceries := 'cherries' + ' nectarines'\r\n" +
+                "v:groceries += ' grapes'\r\n" +
+                "v:errand := 'go get ' + v:groceries"
+            },
+            expected: new List<object>()
+            {
+                new InputVar("v:errand", "go get cherries nectarines grapes")
+            });
+        }
+
+        [TestMethod]
+        public void StringNonStringAddition()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:pies := \"we have \" + 3"
+            },
+            expected: new List<object>()
+            {
+                new InputVar("v:pies", "we have 3")
+            });
+        }
+
+        [TestMethod]
+        public void StringCasts()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "c:d(\"13.5\") + 5"
+            },
+            expected: new List<object>()
+            {
+                18.5
+            });
+        }
+
+        [TestMethod]
+        public void StringLibraryLength()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "import basic:string l:str\r\n" +
+                "l:str.f:length(\"boathouse\")"
+            },
+            expected: new List<object>()
+            {
+                9
+            });
+        }
+
+        [TestMethod]
+        public void StringArrayCommaAnd()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "import basic:string l:str\r\n" +
+                "v:groceries := ('cherries', 'nectarines', 'grapes')\r\n" +
+                "l:str.f:commaand(v:groceries)"
+            },
+            expected: new List<object>()
+            {
+                "cherries, nectarines, and grapes"
+            });
+        }
+
+        [TestMethod]
+        public void MathLibraryExample()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "import basic:math l:math\r\n" +
+                "l:math.f:max(100,30,0)"
+            },
+            expected: new List<object>()
+            {
+                100.0
+            });
+        }
+
+        [TestMethod]
+        public void LibraryAnon()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "import basic:math anon\r\n" +
+                "f:sqrt(9)"
+            },
+            expected: new List<object>()
+            {
+                3.0
+            });
+        }
+
+        [TestMethod]
+        public void DefnPoint()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "defn d:point {\r\n" +
+                "    v:x := 0\r\n" +
+                "    v:y := 0\r\n" +
+                "    f:init := {\r\n" +
+                "        a:x a:y\r\n" +
+                "        v:x = a:x\r\n" +
+                "        v:y = a:y\r\n" +
+                "    }\r\n" +
+                "    f:array := { v:x, v:y }\r\n" +
+                "}\r\n" +
+                "\r\n" +
+                "v:point1 := object anon d:point (5, 10)\r\n" +
+                "v:point1.f:array()[0]",
+                "v:point1.f:array()[1]"
+            },
+            expected: new List<object>()
+            {
+                new InputVar("v:x", 5.0),
+                new InputVar("v:y", 10.0)
+            });
+        }
+
+        [TestMethod]
+        public void DefnTurbineHigherScope()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:energy := 0\r\n" +
+                "f:waste := { v:energy -= 2 }\r\n" +
+                "defn d:turbine {\r\n" +
+                "    f:spin := { \r\n" +
+                "        v:energy += 5 \r\n" +
+                "        f:waste()\r\n" +
+                "    }\r\n" +
+                "}\r\n" +
+                "v:t1 := object anon d:turbine ()\r\n" +
+                "v:t1.f:spin()\r\n" +
+                "v:t1.f:spin()"
+            },
+            expected: new List<object>()
+            {
+                6.0
+            });
+        }
     }
 }

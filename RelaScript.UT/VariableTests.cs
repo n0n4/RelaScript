@@ -177,5 +177,41 @@ namespace RelaScript.UT
                 new InputVar("v:d", 1.0)
             });
         }
+
+        [TestMethod]
+        public void ArrayVarTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "import basic:math l:math\r\n" +
+                "l:math.f:max((1, 2, 3))",
+                "v:a := (1, 2, 3)\r\n" +
+                "l:math.f:max(v:a)",
+            },
+            expected: new List<object>()
+            {
+                3.0,
+                3.0,
+            });
+        }
+
+        [TestMethod]
+        public void ArrayStringVarTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "import basic:string l:str\r\n" +
+                "l:str.f:commaand(('a','b','c'))",
+                "v:s := ('a','b','c')\r\n" +
+                "l:str.f:commaand(v:s)"
+            },
+            expected: new List<object>()
+            {
+                "a, b, and c",
+                "a, b, and c",
+            });
+        }
     }
 }
