@@ -324,5 +324,40 @@ namespace RelaScript.UT
                 0.0
             });
         }
+
+        // NOTE:
+        // this test exists because of a peculiar bug
+        // if any scope came before a defn, it would prevent
+        // the defn from being linked to the correct scope
+        // (i.e. what it was doing was always linking the defn to currentscope + 1
+        //  but that was only valid if the defn was exactly the next scope)
+        [TestMethod]
+        public void DefnPriorScopeTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "f:aaa := { 0 } \r\n" +
+                "defn d:point {\r\n" +
+                "    v:x := 0\r\n" +
+                "    v:y := 0\r\n" +
+                "    f:init := {\r\n" +
+                "        a:x a:y\r\n" +
+                "        v:x = a:x\r\n" +
+                "        v:y = a:y\r\n" +
+                "    }\r\n" +
+                "    f:array := { v:x, v:y }\r\n" +
+                "}\r\n" +
+                "\r\n" +
+                "v:point1 := object anon d:point (5, 10)\r\n" +
+                "v:point1.f:array()[0]",
+                "v:point1.f:array()[1]"
+            },
+            expected: new List<object>()
+            {
+                new InputVar("v:x", 5.0),
+                new InputVar("v:y", 10.0)
+            });
+        }
     }
 }

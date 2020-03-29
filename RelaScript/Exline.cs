@@ -999,8 +999,9 @@ namespace RelaScript
             // now construct the expression tree
             List<Expression> outputExpressions = new List<Expression>();
 
-            Expression determineExpression(int output, int term)
+            Expression determineExpression(int output, int term, out int newscopeid)
             {
+                newscopeid = -1;
                 switch (termtype[output][term])
                 {
                     case ETermType.VAR:
@@ -1078,6 +1079,7 @@ namespace RelaScript
                         {
                             InputContext newemptyscope = new InputContext(CompiledContextsList[scopeContext], CompiledContextsList.Count);
                             CompiledContextsList.Add(newemptyscope);
+                            newscopeid = newemptyscope.ScopeId;
                             return LinesCompile("0", argParams, inputParams, contextParams, varNameToIndex,
                                 newemptyscope.ScopeId, false);
                             //return Expression.Convert(Expression.Constant(0.0), typeof(object));
@@ -1091,6 +1093,7 @@ namespace RelaScript
                         // create a new scope
                         InputContext newscope = new InputContext(CompiledContextsList[scopeContext], CompiledContextsList.Count);
                         CompiledContextsList.Add(newscope);
+                        newscopeid = newscope.ScopeId;
                         return LinesCompile(nextlineb, argParams, inputParams, contextParams, varNameToIndex, 
                             newscope.ScopeId, false);
                     case ETermType.STRING:
@@ -1157,8 +1160,18 @@ namespace RelaScript
                 }
 
                 List<Expression> exprs = new List<Expression>();
+                List<int> exprsScopeIds = new List<int>();
+                // note: using the exprsScopeIds list to keep track of,
+                // if an expression creates a new scope, what is it's id?
+                // this is specifically needed for defn creation
+                // e.g. defn d:a { ... }, we need to know which scopeid
+                // { ... } corresponds to so we can reference it as
+                // the defn's implementation
                 for (int o = 0; o < terms[i].Count; o++)
-                    exprs.Add(determineExpression(i, o));
+                {
+                    exprs.Add(determineExpression(i, o, out int newscopeid));
+                    exprsScopeIds.Add(newscopeid);
+                }
 
                 if (oporder.Count > 0)
                 {
@@ -1263,7 +1276,7 @@ namespace RelaScript
                                                 Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext)),
                                                 typeof(InputContext).GetRuntimeMethod("DefineClass", new Type[] { typeof(string), typeof(InputContext) }),
                                                 exprs[leftindex],
-                                                Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext + 1)))
+                                                Expression.ArrayIndex(contextParams, Expression.Constant(exprsScopeIds[rightindex])))
                                         );
                                         // this is a bit of (a lot of) a hack: we assume THE NEXT CONTEXT SCOPE is
                                         // the definition context. however, this could fail in this specific case:
