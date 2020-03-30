@@ -10,9 +10,10 @@ namespace RelaScript.Objects
         public InputContext Implementation = new InputContext();
         public bool Freed = false;
 
-        public InputObject(string name)
+        public InputObject(string name, int scopeid)
         {
             Name = name;
+            Implementation.ScopeId = scopeid;
         }
 
         public void Free()

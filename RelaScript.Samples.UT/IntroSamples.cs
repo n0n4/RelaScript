@@ -635,7 +635,7 @@ namespace RelaScript.Samples.UT
                 new InputVar("v:y", 10.0)
             });
         }
-
+        
         [TestMethod]
         public void DefnTurbineHigherScope()
         {
@@ -645,6 +645,7 @@ namespace RelaScript.Samples.UT
                 "v:energy := 0\r\n" +
                 "f:waste := { v:energy -= 2 }\r\n" +
                 "defn d:turbine {\r\n" +
+                "    v:x := 0\r\n" +
                 "    f:spin := { \r\n" +
                 "        v:energy += 5 \r\n" +
                 "        f:waste()\r\n" +
@@ -656,7 +657,7 @@ namespace RelaScript.Samples.UT
             },
             expected: new List<object>()
             {
-                6.0
+                new InputVar("v:energy", 6.0)
             });
         }
     }

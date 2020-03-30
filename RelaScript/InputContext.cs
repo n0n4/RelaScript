@@ -293,6 +293,23 @@ namespace RelaScript
             return nc;
         }
 
+        public bool SetClass(string name, InputClass defn, bool originator = true)
+        {
+            if (originator)
+                name = name.ToLower();
+            if (!Classes.TryGetValue(name, out InputClass c))
+            {
+                // if we don't find a var in our own scope, check further up the scope tree
+                if (ParentScope != null && ParentScope.SetClass(name, defn, false))
+                    return true;
+                if (originator) // if it isn't found anywhere, define it
+                    Classes[name] = defn;
+                return false;
+            }
+            Classes[name] = defn;
+            return true;
+        }
+
         public InputClass GetClass(string name, bool originator = true)
         {
             if (originator)
@@ -330,6 +347,23 @@ namespace RelaScript
             return o;
         }
 
+        public bool SetObject(string name, InputObject obj, bool originator = true)
+        {
+            if (originator)
+                name = name.ToLower();
+            if (!Objects.TryGetValue(name, out InputObject var))
+            {
+                // if we don't find a var in our own scope, check further up the scope tree
+                if (ParentScope != null && ParentScope.SetObject(name, obj, false))
+                    return true;
+                if (originator) // if it isn't found anywhere, define it
+                    Objects[name] = obj;
+                return false;
+            }
+            Objects[name] = obj;
+            return true;
+        }
+
         public InputObject GetObject(string name, bool originator = true)
         {
             if (originator)
@@ -364,6 +398,15 @@ namespace RelaScript
             return true;
         }
 
+        public void CopyFull(InputContext target)
+        {
+            CopyVars(target);
+            CopyFuncs(target);
+            CopyLibraries(target);
+            CopyClasses(target);
+            CopyObjects(target);
+        }
+
         public void CopyVars(InputContext target)
         {
             foreach(var kvp in Vars)
@@ -385,6 +428,22 @@ namespace RelaScript
             foreach(var kvp in Libs)
             {
                 target.SetLibrary(kvp.Key, kvp.Value);
+            }
+        }
+
+        public void CopyClasses(InputContext target)
+        {
+            foreach (var kvp in Classes)
+            {
+                target.SetClass(kvp.Key, kvp.Value);
+            }
+        }
+
+        public void CopyObjects(InputContext target)
+        {
+            foreach (var kvp in Objects)
+            {
+                target.SetObject(kvp.Key, kvp.Value);
             }
         }
 

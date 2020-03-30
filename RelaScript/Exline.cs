@@ -166,18 +166,63 @@ namespace RelaScript
 
         public InputContext[] CopyContextTree(InputContext newContext)
         {
-            List<InputContext> cs = new List<InputContext>();
-            cs.Add(newContext);
+            // all input contexts prior to the one we need to replace 
+            // must be referenced (not copied!)
+            // all input context after the one to replace should be
+            // copied, not referenced
 
-            // note: iterating forward ensures that each parent scope is added before its children
-            for(int i = 1; i < CompiledContexts.Length; i++)
+            InputContext[] cs = new InputContext[CompiledContexts.Length];
+
+            // here's the procedure:
+            // for each context, 
+            // -- if it traces back to newContext.ScopeId, make a copy of it
+            // -- otherwise, reference it directly
+
+            List<int> copyParentScopes = new List<int>() { newContext.ScopeId };
+
+            bool shouldCopy(InputContext check)
             {
-                InputContext parent = cs[CompiledContexts[i].ParentScope.ScopeId];
-                InputContext nc = new InputContext(parent, i);
-                cs.Add(nc);
+                if (copyParentScopes.Contains(check.ScopeId))
+                    return true;
+                if(check.ParentScope != null && shouldCopy(check.ParentScope))
+                {
+                    copyParentScopes.Add(check.ScopeId);
+                    return true;
+                }
+                return false;
             }
 
-            return cs.ToArray();
+            for(int i = 0; i < CompiledContexts.Length; i++)
+            {
+                if(i == newContext.ScopeId)
+                {
+                    cs[i] = newContext;
+                    continue;
+                }
+                InputContext compiled = CompiledContexts[i];
+                if (shouldCopy(compiled))
+                {
+                    InputContext parent = cs[compiled.ParentScope.ScopeId];
+                    InputContext nc = new InputContext(parent, i);
+                    // compiled.CopyFull(nc);
+                    // leaving this commented ^
+                    // because it's a point of contention
+                    // do we want to create a full copy here?
+                    // as far as I can tell, doing so breaks this process
+                    // and isn't necessary.
+                    // but that defies my expectations-- shouldn't we want these
+                    // contexts to be copies of their source?
+                    // puzzling
+                    // for now, it seems unnecessary 
+                    cs[i] = nc;
+                }
+                else
+                {
+                    cs[i] = compiled;
+                }
+            }
+
+            return cs;
         }
 
         private static char[] WhileChars = new char[] { 'w', 'h', 'i', 'l', 'e' };

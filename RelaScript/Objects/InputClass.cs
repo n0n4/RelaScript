@@ -17,19 +17,17 @@ namespace RelaScript.Objects
 
         public InputObject PrintObject(string name)
         {
-            InputObject o = new InputObject(name);
-            Definition.CopyVars(o.Implementation);
-            Definition.CopyFuncs(o.Implementation);
-            Definition.CopyLibraries(o.Implementation);
+            InputObject o = new InputObject(name, Definition.ScopeId);
+            o.Implementation.ParentScope = Definition.ParentScope;
+            Definition.CopyFull(o.Implementation);
             return o; 
         }
 
         public InputClass PrintSubclass(string name)
         {
             InputClass o = new InputClass(name, new InputContext());
-            Definition.CopyVars(o.Definition);
-            Definition.CopyFuncs(o.Definition);
-            Definition.CopyLibraries(o.Definition);
+            o.Definition.ParentScope = Definition.ParentScope;
+            Definition.CopyFull(o.Definition);
             return o;
         }
     }

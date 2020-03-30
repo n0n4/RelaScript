@@ -18,6 +18,7 @@ namespace RelaScript
         {
             Name = name;
             Value = value;
+            ScopeId = scopeid;
         }
 
         public InputVar SetAndReturn(object value)
