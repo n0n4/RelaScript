@@ -275,6 +275,86 @@ namespace RelaScript.UT
         }
 
         [TestMethod]
+        public void Array2dIndexTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := ((1,2,3),(4,5,6))" +
+                "v:a[0][0]",
+                "v:a[1][1]",
+                "v:a[1][2]",
+            },
+            expected: new List<object>()
+            {
+                1.0,
+                5.0,
+                6.0,
+            });
+        }
+
+        [TestMethod]
+        public void Array3dIndexTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := (((1,2,3),(4,5,6)),((7,8,9),(10,11,12)))" +
+                "v:a[0][0][0]",
+                "v:a[1][1][1]",
+                "v:a[1][0][2]",
+            },
+            expected: new List<object>()
+            {
+                1.0,
+                11.0,
+                9.0,
+            });
+        }
+
+        [TestMethod]
+        public void ArrayAssignTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := (1,2,3)\r\n" +
+                "v:a[1] = 5\r\n" +
+                "v:a[2] = 6\r\n" +
+                "v:a[0]",
+                "v:a[1]",
+                "v:a[2]",
+            },
+            expected: new List<object>()
+            {
+                1.0,
+                5.0,
+                6.0,
+            });
+        }
+
+        [TestMethod]
+        public void Array2dAssignTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := ((1,2,3),(0,0,0))\r\n" +
+                "v:a[1][1] = 5\r\n" +
+                "v:a[1][2] = 6\r\n" +
+                "v:a[0][0]",
+                "v:a[1][1]",
+                "v:a[1][2]",
+            },
+            expected: new List<object>()
+            {
+                1.0,
+                5.0,
+                6.0,
+            });
+        }
+
+        [TestMethod]
         public void FunctionArrayIndexTest()
         {
             InputContext context = new InputContext();

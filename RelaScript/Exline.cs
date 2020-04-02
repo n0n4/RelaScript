@@ -1507,6 +1507,11 @@ namespace RelaScript
                             // assignment operators
                             case '=':
                                 { // set operator
+                                    if(exprs[leftindex] is IndexExpression)
+                                    {
+                                        exprs[leftindex] = Expression.Assign(exprs[leftindex], ExFuncs.GetArgAsObject(exprs[rightindex]));
+                                        break;
+                                    }
                                     if(exprs[leftindex].Type == typeof(object))
                                     {
                                         // unknown type at compile time, we will have to inspect it at runtime
@@ -1860,13 +1865,13 @@ namespace RelaScript
                                 // (if returned from a function, it's currently an object! and not an object[]!
                                 if (exprs[leftindex].Type == typeof(object))
                                 {
-                                    exprs[leftindex] = Expression.ArrayIndex(
+                                    exprs[leftindex] = Expression.ArrayAccess(
                                         Expression.Convert(exprs[leftindex], typeof(object[])),
                                         Expression.Convert(exprs[rightindex], typeof(int)));
                                 }
                                 else
                                 {
-                                    exprs[leftindex] = Expression.ArrayIndex(
+                                    exprs[leftindex] = Expression.ArrayAccess(
                                         exprs[leftindex],
                                         Expression.Convert(exprs[rightindex], typeof(int)));
                                 }
