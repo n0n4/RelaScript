@@ -18,6 +18,10 @@ namespace RelaScript
             Random = new Random(seed);
         }
 
+        public void SetSeed(int seed)
+        {
+            Random = new Random(seed);
+        }
 
         public double RandomDouble(double min, double max)
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RelaScript.Libraries.Basics;
 
 namespace RelaScript.UT
 {
@@ -104,8 +105,9 @@ namespace RelaScript.UT
         public void FunctionTest()
         {
             InputContext context = new InputContext();
+            context.LibraryProviders.Add(new LibraryProviderBasic());
 
-            Exline e1 = new Exline("2 * f:sin(10)");
+            Exline e1 = new Exline("import basic:math anon \r\n 2 * f:sin(10)");
             Exline e2 = new Exline("f:sin(2)");
             Exline e3 = new Exline("2 * f:sin(1 - (3 * 4)) - 1");
 
@@ -313,6 +315,21 @@ namespace RelaScript.UT
         }
 
         [TestMethod]
+        public void ArrayVarIndexTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := (1,2,3) v:b := 1 " +
+                "v:a[v:b]",
+            },
+            expected: new List<object>()
+            {
+                2.0,
+            });
+        }
+
+        [TestMethod]
         public void ArrayAssignTest()
         {
             TestScaffold.TestLines(
@@ -330,6 +347,22 @@ namespace RelaScript.UT
                 1.0,
                 5.0,
                 6.0,
+            });
+        }
+
+        [TestMethod]
+        public void ArrayVarAssignTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := (1,2,3) v:b := 1 " +
+                "v:a[v:b] = 5 " +
+                "v:a[1]",
+            },
+            expected: new List<object>()
+            {
+                5.0,
             });
         }
 

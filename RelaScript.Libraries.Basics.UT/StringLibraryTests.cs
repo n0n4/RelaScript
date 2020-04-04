@@ -54,6 +54,27 @@ namespace RelaScript.Libraries.Basics.UT
         }
 
         [TestMethod]
+        public void AnonSubstringTest()
+        {
+            TestScaffold.TestLinesOrderAndSequential(
+                lines: new List<string>()
+                {
+                    "f:import('basic:string','anon');0.0",
+                    "f:substring('rare',c:i(1))",
+                    "f:substring('boat' + 'house',2,4)",
+                    "f:substring(c:s(c:i(12)),1)"
+                },
+                expected: new List<object>()
+                {
+                    0.0,
+                    "are",
+                    "atho",
+                    "2"
+                }
+            );
+        }
+
+        [TestMethod]
         public void CommaTest()
         {
             TestScaffold.TestLinesOrderAndSequential(

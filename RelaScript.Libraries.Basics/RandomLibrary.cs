@@ -65,6 +65,11 @@ namespace RelaScript.Libraries.Basics
             }
         }
 
+        public void Inject(InputContext context, string asname)
+        {
+            LibraryUtility.DefaultInject(this, context, asname);
+        }
+
         public double RandomDouble(double min, double max, IRandomProvider random)
         {
             return random.RandomDouble(min, max);

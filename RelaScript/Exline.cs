@@ -1079,6 +1079,8 @@ namespace RelaScript
                         //return Expression.ArrayIndex(inputParams, Expression.Constant(varNameToIndex[terms[output][term]]));
                     case ETermType.ARG:
                         string rest = terms[output][term].Substring(2);
+                        if (rest == "all")
+                            return argParams;
                         if(rest[0].IsNumber()) // if arg is a number, access it directly (e.g. a:0)
                             return Expression.ArrayIndex(argParams, Expression.Constant(int.Parse(rest)));
                         // if it's not a number, access it via argmap (e.g. a:red)
@@ -1861,19 +1863,20 @@ namespace RelaScript
                             case '[':
                                 //  unpack from var
                                 exprs[leftindex] = ExCasts.UnwrapVariable(exprs[leftindex]);
+                                exprs[rightindex] = ExCasts.GetExpressionObjectAsInt(exprs[rightindex]);
                                 // need to ensure that the array is in the right format 
                                 // (if returned from a function, it's currently an object! and not an object[]!
                                 if (exprs[leftindex].Type == typeof(object))
                                 {
                                     exprs[leftindex] = Expression.ArrayAccess(
                                         Expression.Convert(exprs[leftindex], typeof(object[])),
-                                        Expression.Convert(exprs[rightindex], typeof(int)));
+                                        exprs[rightindex]);
                                 }
                                 else
                                 {
                                     exprs[leftindex] = Expression.ArrayAccess(
                                         exprs[leftindex],
-                                        Expression.Convert(exprs[rightindex], typeof(int)));
+                                        exprs[rightindex]);
                                 }
                                 break;
                             // dot accessor operator

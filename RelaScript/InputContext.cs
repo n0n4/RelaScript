@@ -14,6 +14,8 @@ namespace RelaScript
         private Dictionary<string, InputClass> Classes = new Dictionary<string, InputClass>();
         private Dictionary<string, InputObject> Objects = new Dictionary<string, InputObject>();
 
+        private int AnonLibCount = 0;
+
         private List<string> ArgList = new List<string>();
 
         public List<ILibraryProvider> LibraryProviders = new List<ILibraryProvider>();
@@ -253,6 +255,15 @@ namespace RelaScript
             // TODO: decide if this is what we want to happen?
             //       or should they function like vars/funcs?
             asname = asname.ToLower();
+
+            // special case: if anon, add the functions to the context itself
+            if(asname == "anon")
+            {
+                lib.Inject(this, GenerateAnonLibraryName());
+                AnonLibCount++;
+                return;
+            }
+
             if (!Libs.ContainsKey(asname))
             {
                 Libs.Add(asname, lib);
@@ -261,6 +272,11 @@ namespace RelaScript
             {
                 Libs[asname] = lib;
             }
+        }
+
+        private string GenerateAnonLibraryName()
+        {
+            return "l:anonlib" + AnonLibCount;
         }
 
         public ILibrary GetLibrary(string asname, bool originator = true)

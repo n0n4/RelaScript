@@ -596,6 +596,13 @@ namespace RelaScript.Samples.UT
         [TestMethod]
         public void LibraryAnon()
         {
+            /* 
+             * her'es the issue:
+                - when lib gets a:all, it sees it like (9) rather than 9
+                f:sqrt(9) -> object[] { 9 } 
+
+                - the lib methods however aren't equipped to handle this2:47 AM 4/3/2020
+             */
             TestScaffold.TestLines(
             lines: new List<string>()
             {
@@ -658,6 +665,90 @@ namespace RelaScript.Samples.UT
             expected: new List<object>()
             {
                 new InputVar("v:energy", 6.0)
+            });
+        }
+
+        [TestMethod]
+        public void FunctionArrayArgs()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "f:add := { a:0 + a:1 } \r\n" +
+                "// all of these return 3: \r\n" +
+                "f:add(1, 2)",
+                "f:add((1, 2))",
+                "v:arr := (1, 2) \r\n" +
+                "f:add(v:arr)"
+            },
+            expected: new List<object>()
+            {
+                3.0,
+                3.0,
+                3.0
+            });
+        }
+
+        [TestMethod]
+        public void FunctionArrayWithOtherArgs()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "f:addandmult := { (a:0[0] + a:0[1]) * a:1 } \r\n" +
+                "// all of these return 30: \r\n" +
+                "f:addandmult((1,2), 10)",
+                "v:arr := (1, 2) \r\n" +
+                "f:addandmult(v:arr, 10)"
+            },
+            expected: new List<object>()
+            {
+                30.0,
+                30.0
+            });
+        }
+
+        [TestMethod]
+        public void FunctionArrayWithOtherArgsAllVars()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "f:addandmult := { (a:0[0] + a:0[1]) * a:1 } \r\n" +
+                "// return 30: \r\n" +
+                "v:arr := (1, 2) v:amount := 10 \r\n" +
+                "f:addandmult(v:arr, v:amount)"
+            },
+            expected: new List<object>()
+            {
+                30.0
+            });
+        }
+
+        [TestMethod]
+        public void FunctionAllArgs()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "import basic:array l:array \r\n" +
+                "f:addarray := { \r\n" +
+                "    v:len := l:array.f:length(a:all) \r\n" +
+                "    v:sum := 0 \r\n" +
+                "    v:i := 0 \r\n" +
+                "    while (v:i < v:len) { \r\n" +
+                "        v:sum += a:all[v:i] \r\n" +
+                "        v:i += 1 \r\n" +
+                "    } \r\n" +
+                "    v:sum \r\n" +
+                "} \r\n" +
+                " \r\n" +
+                "f:addarray(1, 2, 3, 4) \r\n" +
+                "// returns 10"
+            },
+            expected: new List<object>()
+            {
+                new InputVar("v:sum", 10.0)
             });
         }
     }

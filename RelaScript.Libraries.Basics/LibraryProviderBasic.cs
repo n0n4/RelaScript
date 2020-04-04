@@ -16,6 +16,8 @@ namespace RelaScript.Libraries.Basics
                     return new RandomLibrary();
                 case "basic:string":
                     return new StringLibrary();
+                case "basic:array":
+                    return new ArrayLibrary();
                 default:
                     return null;
             }

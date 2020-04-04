@@ -36,6 +36,28 @@ namespace RelaScript.Libraries.Basics.UT
         }
 
         [TestMethod]
+        public void AnonRandomTest()
+        {
+            IRandomProvider rp = new RandomBasic(0);
+            TestScaffold.TestLines(
+                lines: new List<string>()
+                {
+                    "f:import('basic:random','anon');0.0",
+                    "f:random(1.0, 2.0)",
+                    "f:random(-12.5, 125.0)",
+                    "f:random(-12.5, c:i(125))"
+                },
+                expected: new List<object>()
+                {
+                    0.0,
+                    rp.RandomDouble(1.0,2.0),
+                    rp.RandomDouble(-12.5,125.0),
+                    rp.RandomDouble(-12.5,125.0)
+                }
+            );
+        }
+
+        [TestMethod]
         public void RandomIntTest()
         {
             IRandomProvider rp = new RandomBasic(0);

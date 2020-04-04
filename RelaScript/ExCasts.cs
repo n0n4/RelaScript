@@ -65,7 +65,7 @@ namespace RelaScript
             else if (args.Type == typeof(string[]))
                 return Expression.Call(typeof(ExCasts).GetTypeInfo().GetDeclaredMethod("RewrapStringArray"), args);
             else if (args.Type == typeof(object[]))
-                return args;
+                return Expression.Call(typeof(ExCasts).GetTypeInfo().GetDeclaredMethod("InspectObjectArrayForVars"), args);
             else if (args.Type == typeof(InputVar))
                 return WrapArguments(Expression.Field(args, "Value"));
             //return Expression.NewArrayInit(typeof(object), Expression.Field(args, "Value"));
@@ -76,12 +76,27 @@ namespace RelaScript
                 // in this case, it needs to be inspected at the time, incase it is returned from a
                 // function call that returns an object[] as an object.
                 // if it is an object[] masquereding as an object, leave it as is.
-                return Expression.Call(typeof(ExCasts).GetTypeInfo().GetDeclaredMethod("InspectObjectForObjectArray"), args);
+                return Expression.Call(typeof(ExCasts).GetTypeInfo().GetDeclaredMethod("InspectObjectArrayForVars"), 
+                    Expression.Call(typeof(ExCasts).GetTypeInfo().GetDeclaredMethod("InspectObjectForObjectArray"), args));
                 //return Expression.IfThenElse(Expression.IsTrue(Expression.TypeIs(args, typeof(object[]))),
                 //    args, Expression.NewArrayInit(typeof(object), args));
                 //return Expression.NewArrayInit(typeof(object), args);
             }
             return args;
+        }
+
+        private static object[] InspectObjectArrayForVars(object[] arr)
+        {
+            for (int i = 0; i < arr.Length; i++)
+                arr[i] = UnwrapAtRuntime(arr[i]);
+            // special case here to fix a particular problem
+            // this may not be the right solution... but so far it has held up
+            // here's the deal: when a variable that is an array is passed as an argument
+            // into a library function, it ends up being rendered as [[1,2,3]] instead of [1,2,3]
+            // in this case, we resolve it via this check
+            if (arr.Length == 1 && arr[0] is object[])
+                return (object[])arr[0];
+            return arr;
         }
 
         private static object[] RewrapDoubleArray(double[] ds)
@@ -128,7 +143,7 @@ namespace RelaScript
             return os;
         }
 
-        private static object[] InspectObjectForObjectArray(object o)
+        public static object[] InspectObjectForObjectArray(object o)
         {
             if (o is object[])
                 return (object[])o;
@@ -199,8 +214,6 @@ namespace RelaScript
             return o.ToString();
         }
 
-
-
         public static int GetObjectAsInt(object o)
         {
             if (o is int)
@@ -217,7 +230,7 @@ namespace RelaScript
             if (exp.Type == typeof(double))
                 return Expression.Convert(ExCasts.UnwrapVariable(exp), typeof(int));
             return Expression.Call(typeof(ExCasts).GetTypeInfo().GetDeclaredMethod("GetObjectAsInt"),
-                exp);
+                ExCasts.UnwrapVariable(exp));
         }
 
         public static double GetObjectAsDouble(object o)
@@ -290,12 +303,12 @@ namespace RelaScript
             {
                 // if at least one is the expected type, go with the expected type
                 aout = a;
-                bout = Expression.Convert(b, expected);
+                bout = InferTypeConvert(b, expected);
             }
             else if (expected != null && b.Type == expected)
             {
                 bout = b;
-                aout = Expression.Convert(a, expected);
+                aout = InferTypeConvert(a, expected);
             }
 
             for (int i = 0; i < InferTypes.Length; i++)
@@ -309,25 +322,26 @@ namespace RelaScript
                 else if (a.Type == InferTypes[i])
                 {
                     aout = a;
-                    bout = Expression.Convert(b, InferTypes[i]);
+                    bout = InferTypeConvert(b, InferTypes[i]);
                     return;
                 }
                 else if (b.Type == InferTypes[i])
                 {
                     bout = b;
-                    aout = Expression.Convert(a, InferTypes[i]);
+                    aout = InferTypeConvert(a, InferTypes[i]);
                     return;
                 }
             }
             // see if we have an expected type
             if (expected != null)
             {
+                // generic failsafe
                 if (a.Type != expected)
-                    aout = Expression.Convert(a, expected);
+                    aout = InferTypeConvert(a, expected);
                 else
                     aout = a;
                 if (b.Type != expected)
-                    bout = Expression.Convert(b, expected);
+                    bout = InferTypeConvert(b, expected);
                 else
                     bout = b;
                 return;
@@ -335,6 +349,20 @@ namespace RelaScript
             // not recognized, throw it to the wind and pray
             aout = a;
             bout = b;
+        }
+
+        private static Expression InferTypeConvert(Expression exp, Type type)
+        {
+            // we have special conversions due to unboxing concerns
+            // the expression tree can't handle converting e.g. an object-int to a double
+            if (type == typeof(double))
+                return GetExpressionObjectAsDouble(exp);
+            else if (type == typeof(int))
+                return GetExpressionObjectAsInt(exp);
+
+            // failsafe: just try a default convert
+            // (note: we really shouldn't let this happen)
+            return Expression.Convert(exp, type);
         }
     }
 }

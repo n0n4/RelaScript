@@ -48,6 +48,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArrayLibraryTests.cs" />
+    <Compile Include="BasicLibraryTests.cs" />
     <Compile Include="MathLibraryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomLibraryTests.cs" />

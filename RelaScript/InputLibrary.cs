@@ -44,5 +44,11 @@ namespace RelaScript
         {
             return Name;
         }
+
+        public void Inject(InputContext context, string asname)
+        {
+            throw new Exception("not implemented");
+            //LibraryUtility.DefaultInject(this, context, asname);
+        }
     }
 }

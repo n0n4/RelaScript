@@ -290,7 +290,23 @@ namespace RelaScript.UT
         [TestMethod]
         public void FreeObjectTest()
         {
-            throw new Exception("TODO");
+            InputContext context = new InputContext();
+
+            Exline e1 = new Exline("defn d:blob {\r\n" +
+                "    v:size := (0)\r\n" +
+                "    f:init := {\r\n" +
+                "        a:size\r\n" +
+                "        v:size = f:array(a:size)\r\n" +
+                "    }\r\n" +
+                "}\r\n" +
+                "\r\n" +
+                "object o:blob1 d:blob (600)\r\n" +
+                "free o:blob1\r\n" +
+                "o:blob1");
+
+            context.CompileLine(e1);
+            e1.Execute(new object[] { 0 });
+            Assert.IsTrue(context.GetObject("o:blob1") == null);
         }
 
         [TestMethod]

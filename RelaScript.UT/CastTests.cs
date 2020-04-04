@@ -63,6 +63,36 @@ namespace RelaScript.UT
         }
 
         [TestMethod]
+        public void InferredConditionalIntToDoubleTest()
+        {
+            TestScaffold.TestLinesOrderAndSequential(
+                lines: new List<string>()
+                {
+                    "if (10 < c:i(100)) { 5 } else { 7 }",
+                },
+                expected: new List<object>()
+                {
+                    5.0
+                }
+            );
+        }
+
+        [TestMethod]
+        public void InferredConditionalIntToDoubleVarTest()
+        {
+            TestScaffold.TestLinesOrderAndSequential(
+                lines: new List<string>()
+                {
+                    "v:a := c:i(100) if (10 < v:a) { 5 } else { 7 }",
+                },
+                expected: new List<object>()
+                {
+                    5.0
+                }
+            );
+        }
+
+        [TestMethod]
         public void DoubleCastTest()
         {
             TestScaffold.TestLinesOrderAndSequential(

@@ -14,7 +14,72 @@ namespace RelaScript.Libraries.Basics
 
         private List<string> DefaultFunctions = new List<string>()
         {
-            "f:sin", "f:cos", "f:tan", "f:abs", "f:min", "f:max", "f:avg"
+            "f:sin",
+            "f:cos",
+            "f:tan",
+            "f:abs",
+            "f:min",
+            "f:max",
+            "f:avg",
+            "f:sign",
+            "f:pow",
+            "f:sqrt",
+            "f:ln",
+            "f:log10",
+            "f:log",
+            "f:round",
+            "f:floor",
+            "f:ceiling",
+            "f:acos",
+            "f:asin",
+            "f:atan",
+            "f:atan2",
+            "f:cosh",
+            "f:sinh",
+            "f:tanh",
+            "f:exp",
+            "f:clamp",
+            "f:blend",
+            // trigonometric
+            "f:cot",
+            "f:sec",
+            "f:csc",
+            "f:cas",
+            // hyperbolic
+            "f:asinh",
+            "f:acosh",
+            "f:atanh",
+            "f:acoth",
+            "f:asech",
+            "f:acsch",
+            "f:dasinh",
+            "f:dacosh",
+            "f:datanh",
+            "f:dacoth",
+            "f:dasech",
+            "f:dacsch",
+            // periodics
+            "f:clausen",
+            "f:cycloid",
+            "f:squarewave",
+            "f:trianglewave",
+            "f:sawtoothwave",
+            // parametric
+            "f:trochoid",
+            "f:trochoidx",
+            "f:trochoidy",
+            "f:hypotrochoid",
+            "f:hypotrochoidx",
+            "f:hypotrochoidy",
+            "f:epitrochoid",
+            "f:epitrochoidx",
+            "f:epitrochoidy",
+            "f:epicycloid",
+            "f:epicycloidx",
+            "f:epicycloidy",
+            "f:hypocycloid",
+            "f:hypocycloidx",
+            "f:hypocycloidy",
         };
 
         public List<string> GetDefaultFunctions()
@@ -53,19 +118,19 @@ namespace RelaScript.Libraries.Basics
                 case "f:sin":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Sin",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:cos":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Cos",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:tan":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Tan",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:abs":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Abs",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:min":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Min",
                         new[] { typeof(double[]) }),
@@ -81,7 +146,7 @@ namespace RelaScript.Libraries.Basics
                 case "f:sign":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Sign",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:pow":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Pow",
                         new[] { typeof(double), typeof(double) }),
@@ -90,15 +155,15 @@ namespace RelaScript.Libraries.Basics
                 case "f:sqrt":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Sqrt",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:ln":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Ln",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:log10":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Log10",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:log":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Log",
                         new[] { typeof(double), typeof(double) }),
@@ -107,27 +172,27 @@ namespace RelaScript.Libraries.Basics
                 case "f:round":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Round",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:floor":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Floor",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:ceiling":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Ceiling",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:acos":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Acos",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:asin":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Asin",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:atan":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Atan",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:atan2":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Atan2",
                         new[] { typeof(double), typeof(double) }),
@@ -136,19 +201,19 @@ namespace RelaScript.Libraries.Basics
                 case "f:cosh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Cosh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:sinh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Sinh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:tanh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Tanh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:exp":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Exp",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:clamp":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Clamp",
                         new[] { typeof(double), typeof(double), typeof(double) }),
@@ -166,73 +231,73 @@ namespace RelaScript.Libraries.Basics
                 case "f:cot":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Cot",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:sec":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Sec",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:csc":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Csc",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:cas":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Cas",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 // hyperbolic
                 case "f:asinh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Asinh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:acosh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Acosh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:atanh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Atanh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:acoth":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Acoth",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:asech":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Asech",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:acsch":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Acsch",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:dasinh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Dasinh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:dacosh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Dacosh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:datanh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Datanh",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:dacoth":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Dacoth",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:dasech":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Dasech",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:dacsch":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Dacsch",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 // periodics
                 case "f:clausen":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Clausen",
                         new[] { typeof(double[]) }),
-                        ExFuncs.GetArgsAsDouble(argexp));
+                        ExFuncs.GetArgsAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:cycloid":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Cycloid",
                         new[] { typeof(double), typeof(double) }),
@@ -241,15 +306,15 @@ namespace RelaScript.Libraries.Basics
                 case "f:squarewave":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("SquareWave",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:trianglewave":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("TriangleWave",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:sawtoothwave":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("SawtoothWave",
                         new[] { typeof(double) }),
-                        ExFuncs.GetArgAsDouble(argexp));
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 // parametric
                 case "f:trochoid":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Trochoid",
@@ -350,6 +415,11 @@ namespace RelaScript.Libraries.Basics
                 default:
                     throw new Exception("Func '" + funcname + "' not found in library '" + GetLibraryName() + "'");
             }
+        }
+
+        public void Inject(InputContext context, string asname)
+        {
+            LibraryUtility.DefaultInject(this, context, asname);
         }
 
         public double Sin(double i)

@@ -15,7 +15,7 @@ namespace RelaScript.Libraries.Basics
 
         private List<string> DefaultFunctions = new List<string>()
         {
-            "f:substring","f:length","f:comma","f:commaand"
+            "f:substring","f:length","f:comma","f:commaand", "f:replace"
         };
 
         public List<string> GetDefaultFunctions()
@@ -49,22 +49,29 @@ namespace RelaScript.Libraries.Basics
             switch (funcname)
             {
                 case "f:substring":
-                    if (argexp is NewArrayExpression && (argexp as NewArrayExpression).Expressions.Count > 2)
+                    if (argexp is NewArrayExpression)
                     {
+                        if ((argexp as NewArrayExpression).Expressions.Count > 2)
+                        {
+                            return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Substring",
+                                new[] { typeof(string), typeof(int), typeof(int) }),
+                                ExFuncs.GetArgAsString(ExFuncs.GetArgIndex(argexp, 0)),
+                                ExFuncs.GetArgAsInt(ExFuncs.GetArgIndex(argexp, 1)),
+                                ExFuncs.GetArgAsInt(ExFuncs.GetArgIndex(argexp, 2)));
+                        }
                         return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Substring",
-                            new[] { typeof(string), typeof(int), typeof(int) }),
+                            new[] { typeof(string), typeof(int) }),
                             ExFuncs.GetArgAsString(ExFuncs.GetArgIndex(argexp, 0)),
-                            ExFuncs.GetArgAsInt(ExFuncs.GetArgIndex(argexp, 1)),
-                            ExFuncs.GetArgAsInt(ExFuncs.GetArgIndex(argexp, 2)));
+                            ExFuncs.GetArgAsInt(ExFuncs.GetArgIndex(argexp, 1)));
                     }
-                    return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Substring",
-                        new[] { typeof(string), typeof(int) }),
-                        ExFuncs.GetArgAsString(ExFuncs.GetArgIndex(argexp,0)),
-                        ExFuncs.GetArgAsInt(ExFuncs.GetArgIndex(argexp, 1)));
+                    // otherwise we need to inspect the number of args at runtime
+                    return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("SubstringRuntime",
+                            new[] { typeof(object[]) }),
+                            ExCasts.WrapArguments(argexp));
                 case "f:length":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Length",
                         new[] { typeof(string) }),
-                        ExFuncs.GetArgAsString(argexp));
+                        ExFuncs.GetArgAsString(ExFuncs.GetArgIndex(argexp, 0)));
                 case "f:comma":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Comma",
                         new[] { typeof(string[]) }),
@@ -84,6 +91,23 @@ namespace RelaScript.Libraries.Basics
                 default:
                     throw new Exception("Func '" + funcname + "' not found in library '" + GetLibraryName() + "'");
             }
+        }
+
+        public void Inject(InputContext context, string asname)
+        {
+            LibraryUtility.DefaultInject(this, context, asname);
+        }
+
+        public string SubstringRuntime(object[] args)
+        {
+            if (args.Length > 2)
+                return Substring(
+                    ExCasts.GetObjectAsString(args[0]), 
+                    ExCasts.GetObjectAsInt(args[1]),
+                    ExCasts.GetObjectAsInt(args[2]));
+            return Substring(
+                ExCasts.GetObjectAsString(args[0]),
+                ExCasts.GetObjectAsInt(args[1]));
         }
 
         public string Substring(string s, int start)

@@ -14,8 +14,6 @@ namespace RelaScript
         {
             "f:while", "f:for", "f:if",
             "f:newfunc", "f:setfunc", "f:newvar", "f:setvar", "f:getvar", "f:import",
-            "f:sin",
-            "f:random", "f:randomint", "f:roll",
             "f:array"
         };
 
@@ -36,6 +34,8 @@ namespace RelaScript
                 }
                 else
                 {
+                    if (!(argexp is NewArrayExpression))
+                        argexp = ExCasts.WrapArguments(argexp);
                     return lfi.Library.GetFunctionExpression(lfi.FuncName,
                         argexp, argParams, inputParams, 
                         Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext)), compiledInputVarsList);
@@ -277,24 +277,6 @@ namespace RelaScript
                     return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("LookupVar"),
                         GetArgAsString(argexp),
                         Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext)));
-                case "f:sin":
-                    return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("Sin"),
-                        GetArgAsDouble(argexp));
-                case "f:random":
-                    return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("RandomDouble"),
-                        GetArgAsDouble(GetArgIndex(argexp, 0)),
-                        GetArgAsDouble(GetArgIndex(argexp, 1)),
-                        GetRandomArg(Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext))));
-                case "f:randomint":
-                    return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("RandomInt"),
-                        GetArgAsInt(GetArgIndex(argexp, 0)),
-                        GetArgAsInt(GetArgIndex(argexp, 1)),
-                        GetRandomArg(Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext))));
-                case "f:roll":
-                    return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("Roll"),
-                        GetArgAsInt(GetArgIndex(argexp, 0)),
-                        GetArgAsInt(GetArgIndex(argexp, 1)),
-                        GetRandomArg(Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext))));
                 case "f:array":
                     return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("Array"),
                         ExCasts.WrapArguments(argexp));
@@ -353,6 +335,11 @@ namespace RelaScript
 
         public static Expression GetArgIndexUnbox(Expression argexp, int index)
         {
+            if(!(argexp is NewArrayExpression))
+            {
+                // need to do things the worse way, because we can't do this optimization
+                return Expression.ArrayAccess(ExCasts.UnwrapVariable(argexp), Expression.Constant(index));
+            }
             NewArrayExpression arx = argexp as NewArrayExpression;
             return arx.Expressions[index];
         }
@@ -360,7 +347,13 @@ namespace RelaScript
         public static Expression GetArgAsDouble(Expression argexp)
         {
             // see below comment on GetArgAsInt
-            return ExCasts.GetExpressionObjectAsDouble(ExCasts.UnwrapVariable(argexp));
+            Expression dexp = ExCasts.UnwrapVariable(argexp);
+            // special case: in specifically the scenario where we are reading args for a library
+            // method, if we expect only one arg and ask e.g. GetArgAsDouble(args), in some cases
+            // the args may be represented as object[] { arg0 } rather than just arg0
+            //if (dexp.Type == typeof(object[]))
+            //    dexp = Expression.ArrayIndex(dexp, Expression.Constant(0));
+            return ExCasts.GetExpressionObjectAsDouble(dexp);
             //return Expression.Convert(ExCasts.UnwrapVariable(argexp), typeof(double));
         }
 
@@ -377,18 +370,30 @@ namespace RelaScript
             //     is not done for us. If we use this instead, we can have that luxury
             // additionally, I want to move the logic for this out of exfuncs and into excasts
             // as that locale is more appropriate
-            return ExCasts.GetExpressionObjectAsInt(ExCasts.UnwrapVariable(argexp));
+            Expression iexp = ExCasts.UnwrapVariable(argexp);
+            // see note in GetArgAsDouble
+            //if (iexp.Type == typeof(object[]))
+            //    iexp = Expression.ArrayIndex(iexp, Expression.Constant(0));
+            return ExCasts.GetExpressionObjectAsInt(iexp);
             //return Expression.Convert(ExCasts.UnwrapVariable(argexp), typeof(int));
         }
 
         public static Expression GetArgAsString(Expression argexp)
         {
-            return Expression.Convert(ExCasts.UnwrapVariable(argexp), typeof(string));
+            Expression sexp = ExCasts.UnwrapVariable(argexp);
+            // see note in GetArgAsDouble
+            //if (sexp.Type == typeof(object[]))
+            //    sexp = Expression.ArrayIndex(sexp, Expression.Constant(0));
+            return Expression.Convert(sexp, typeof(string));
         }
 
         public static Expression GetArgAsInputVar(Expression argexp, Expression inputContextParam)
         {
-            return Expression.Call(typeof(ExCasts).GetTypeInfo().GetDeclaredMethod("GetInputVar"), argexp, inputContextParam);
+            Expression vexp = argexp;
+            // see note in GetArgAsDouble
+            //if (vexp.Type == typeof(object[]))
+            //    vexp = Expression.ArrayIndex(vexp, Expression.Constant(0));
+            return Expression.Call(typeof(ExCasts).GetTypeInfo().GetDeclaredMethod("GetInputVar"), vexp, inputContextParam);
             // special case: if a string is passed in, look up that var dynamically
             //if(argexp.Type == typeof(string))
             //    return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("LookupVar"),
@@ -414,12 +419,22 @@ namespace RelaScript
 
         public static Expression GetArgAsObject(Expression argexp)
         {
+            // TODO: can we check for object[] here safely? it doesn't seem possible
+            // may need an alternative to these special case object[] checks in the 
+            // getarg methods. The issue arrises when a library is passed in array args
+            // or a:all and is expecting a single arg
+            // maybe we could resolve this by always array-casting the args even if
+            // there's only one, and then expecting the library to index ?
             return Expression.Convert(ExCasts.UnwrapVariable(argexp), typeof(object));
         }
 
         public static Expression GetArgAsBool(Expression argexp)
         {
-            return ExCasts.GetCastExpression(Expression.Constant("c:b"), ExCasts.UnwrapVariable(argexp));
+            Expression bexp = ExCasts.UnwrapVariable(argexp);
+            // see note in GetArgAsDouble
+            //if (bexp.Type == typeof(object[]))
+            //    bexp = Expression.ArrayIndex(bexp, Expression.Constant(0));
+            return ExCasts.GetCastExpression(Expression.Constant("c:b"), bexp);
         }
 
         public static Expression GetRandomArg(Expression inputContextParam)
@@ -615,11 +630,9 @@ namespace RelaScript
             else if(args[0] is object[])
             {
                 object[] sizes = (object[])args[0];
-                if (sizes[0] is double)
-                    sizes[0] = (int)((double)sizes[0]);
-                int size = (int)sizes[0];
+                int size = ExCasts.GetObjectAsInt(ExCasts.UnwrapAtRuntime(sizes[0]));
                 object[] arr = new object[size];
-                if (args.Length > 1)
+                if (args.Length <= 1)
                 {
                     for (int i = 0; i < size; i++)
                         arr[i] = ArrayRecurse(sizes, 1);
@@ -638,10 +651,8 @@ namespace RelaScript
         {
             if (sizes.Length <= sizeindex)
                 return 0;
-
-            if (sizes[sizeindex] is double)
-                sizes[sizeindex] = (int)((double)sizes[sizeindex]);
-            int size = (int)sizes[sizeindex];
+            
+            int size = ExCasts.GetObjectAsInt(ExCasts.UnwrapAtRuntime(sizes[sizeindex]));
             sizeindex++;
             object[] arr = new object[size];
             for (int i = 0; i < size; i++)
@@ -654,9 +665,7 @@ namespace RelaScript
             if (sizes.Length <= sizeindex)
                 return def;
 
-            if (sizes[sizeindex] is double)
-                sizes[sizeindex] = (int)((double)sizes[sizeindex]);
-            int size = (int)sizes[sizeindex];
+            int size = ExCasts.GetObjectAsInt(ExCasts.UnwrapAtRuntime(sizes[sizeindex]));
             sizeindex++;
             object[] arr = new object[size];
             for (int i = 0; i < size; i++)

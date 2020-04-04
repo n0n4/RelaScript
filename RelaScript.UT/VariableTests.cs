@@ -20,6 +20,7 @@ namespace RelaScript.UT
                     "v:alpha * 2.0",
                     "v:alpha + v:beta",
                     "v:alpha + (v:beta)",
+                    "import basic:math anon\r\n" +
                     "v:alpha * f:sin(v:beta)"
                 },
                 expected: new List<object>()
@@ -211,6 +212,26 @@ namespace RelaScript.UT
             {
                 "a, b, and c",
                 "a, b, and c",
+            });
+        }
+
+        [TestMethod]
+        public void ArrayMakeVarArgsTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:h := 10\r\n" +
+                "v:w := 2\r\n" +
+                "v:map := f:array((v:w,v:h), 1)\r\n" +
+                "import basic:array anon\r\n" +
+                "f:length(v:map)",
+                "f:length(v:map[0])"
+            },
+            expected: new List<object>()
+            {
+                2,
+                10
             });
         }
     }

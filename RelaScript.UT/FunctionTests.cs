@@ -16,6 +16,7 @@ namespace RelaScript.UT
             TestScaffold.TestDoubleLines(
                 lines: new List<string>()
                 {
+                    "import basic:math anon\r\n" +
                     "f:sin(10)",
                     "2 * f:sin(3)",
                     "f:sin(f:sin(5))"
@@ -27,36 +28,6 @@ namespace RelaScript.UT
                     Math.Sin(Math.Sin(5.0))
                 });
         }
-        
-        [TestMethod]
-        public void RandomTest()
-        {
-            List<double> rs = TestScaffold.TestDoubleLineRepeat(
-                line: "f:random(1.2,6.4)",
-                count: 1000);
-            foreach(double r in rs)
-                Assert.IsTrue(r >= 1.2 && r <= 6.4);
-        }
-
-        [TestMethod]
-        public void RandomIntTest()
-        {
-            List<double> rs = TestScaffold.TestDoubleLineRepeat(
-                line: "c:d(f:randomint(c:i(1),c:i(6)))",
-                count: 1000);
-            foreach (double r in rs)
-                Assert.IsTrue(r >= 1 && r <= 6);
-        }
-
-        [TestMethod]
-        public void RollTest()
-        {
-            List<double> rs = TestScaffold.TestDoubleLineRepeat(
-                line: "c:d(f:roll(c:i(2),c:i(6)))",
-                count: 1000);
-            foreach (double r in rs)
-                Assert.IsTrue(r >= 2 && r <= 12);
-        }
 
         [TestMethod]
         public void FunctionSpaceParensTest()
@@ -64,6 +35,7 @@ namespace RelaScript.UT
             TestScaffold.TestDoubleLines(
                 lines: new List<string>()
                 {
+                    "import basic:math anon\r\n" +
                     "f:sin (10)",
                     "2 * f:sin (3)",
                     "f:sin (f:sin (5))"
@@ -205,6 +177,48 @@ namespace RelaScript.UT
             expected: new List<object>()
             {
                 11.0
+            });
+        }
+
+        [TestMethod]
+        public void FuncAcceptArrayTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := (2,3); f:test := {a:0 + a:1}; f:test(v:a)"
+            },
+            expected: new List<object>()
+            {
+                5.0
+            });
+        }
+
+        [TestMethod]
+        public void FuncAcceptArrayAndOtherInputTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := (2,3); f:test := {(a:0[0] + a:0[1]) * a:1}; f:test(v:a, 2)"
+            },
+            expected: new List<object>()
+            {
+                10.0
+            });
+        }
+
+        [TestMethod]
+        public void FuncAllArgsTest()
+        {
+            TestScaffold.TestLines(
+            lines: new List<string>()
+            {
+                "v:a := (1,2,3); f:test := {a:all[0] + a:all[1] + a:all[2]}; f:test(v:a)"
+            },
+            expected: new List<object>()
+            {
+                6.0
             });
         }
 
