@@ -19,6 +19,7 @@ namespace RelaScript.Objects
         {
             InputObject o = new InputObject(name, Definition.ScopeId);
             o.Implementation.ParentScope = Definition.ParentScope;
+            o.Implementation.PrintChannel = Definition.PrintChannel;
             Definition.CopyFull(o.Implementation);
             return o; 
         }
@@ -27,6 +28,7 @@ namespace RelaScript.Objects
         {
             InputClass o = new InputClass(name, new InputContext());
             o.Definition.ParentScope = Definition.ParentScope;
+            o.Definition.PrintChannel = Definition.PrintChannel;
             Definition.CopyFull(o.Definition);
             return o;
         }

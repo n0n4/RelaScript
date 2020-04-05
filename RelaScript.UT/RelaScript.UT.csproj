@@ -55,6 +55,7 @@
     <Compile Include="FunctionTests.cs" />
     <Compile Include="LibraryTests.cs" />
     <Compile Include="OperatorTests.cs" />
+    <Compile Include="PrintTests.cs" />
     <Compile Include="RandomProviderTests.cs" />
     <Compile Include="ScopeTests.cs" />
     <Compile Include="SoloBenchmarks.cs" />

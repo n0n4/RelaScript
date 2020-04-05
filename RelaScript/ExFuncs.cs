@@ -14,7 +14,7 @@ namespace RelaScript
         {
             "f:while", "f:for", "f:if",
             "f:newfunc", "f:setfunc", "f:newvar", "f:setvar", "f:getvar", "f:import",
-            "f:array"
+            "f:array", "f:print"
         };
 
         public static Expression GetFunctionExpression(Expression funcexp, Expression argexp,
@@ -81,6 +81,10 @@ namespace RelaScript
                 //    return Expression.ArrayIndex(argexp, 
                 //        Expression.Add(Expression.Constant(1), Expression.Convert(Expression.ArrayIndex(argexp, Expression.Constant(0)), typeof(int))));
                 //        //Expression.Convert(Expression.ArrayIndex(argexp, Expression.Subtract(Expression.ArrayLength(argexp), Expression.Constant(1))), typeof(int)));
+                case "f:print":
+                    return Expression.Call(typeof(ExFuncs).GetTypeInfo().GetDeclaredMethod("Print"),
+                        GetArgAsString(argexp),
+                        Expression.ArrayIndex(contextParams, Expression.Constant(scopeContext)));
                 case "f:return":
                     // todo: make a returnlabel at the end of the expression and return to it
                     //return Expression.Return()
@@ -442,6 +446,11 @@ namespace RelaScript
             return Expression.Field(inputContextParam, "Random");
         }
 
+        public static object Print(string s, InputContext context)
+        {
+            context.PrintChannel.Print(s);
+            return 0;
+        }
 
         public static object NewFunc(string funcname, string line, InputContext context)
         {

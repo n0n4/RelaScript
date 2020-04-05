@@ -103,10 +103,12 @@ namespace RelaScript.UT
         public static List<object> TestLines(List<string> lines,
             List<object[]> args = null, // if non null, pass these args to respective lines
             List<object> expected = null, // if non null, compare results to these
-            Dictionary<string, double> vars = null, Dictionary<string, string> funcs = null)
+            Dictionary<string, double> vars = null, Dictionary<string, string> funcs = null,
+            InputContext context = null)
         {
             // construct a context
-            InputContext context = ConstructContext();
+            if(context == null)
+                context = ConstructContext();
 
             // load vars if they exist
             if (vars != null)

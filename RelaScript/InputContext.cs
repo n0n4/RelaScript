@@ -1,4 +1,5 @@
 ﻿using RelaScript.Objects;
+using RelaScript.Printers;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -24,13 +25,15 @@ namespace RelaScript
         public InputContext ParentScope = null;
         public int ScopeId = 0;
 
+        public PrintChannel PrintChannel = null;
+
         public bool Freed = false;
 
         // TODO: rewrite all these methods so they don't spam .ToLower all the time
 
         public InputContext()
         {
-
+            PrintChannel = new PrintChannel();
         }
 
         public InputContext(InputContext parent, int scopeid)
@@ -39,6 +42,7 @@ namespace RelaScript
             Random = parent.Random;
             LibraryProviders = parent.LibraryProviders;
             ScopeId = scopeid;
+            PrintChannel = parent.PrintChannel;
         }
 
         public void Free()
