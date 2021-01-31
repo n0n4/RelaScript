@@ -689,6 +689,13 @@ namespace RelaScript.Libraries.Basics.UT
         }
 
         [TestMethod]
+        public void SincTest()
+        {
+            MathLibrary ml = new MathLibrary();
+            MathTestSingle("f:sinc", x => { return ml.Sinc(x); });
+        }
+
+        [TestMethod]
         public void ExpTest()
         {
             MathLibrary ml = new MathLibrary();

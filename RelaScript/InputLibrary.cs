@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RelaScript.Libraries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -47,7 +48,12 @@ namespace RelaScript
 
         public void Inject(InputContext context, string asname)
         {
-            throw new Exception("not implemented");
+            // TODO: either of these approaches should work, need to
+            // spend some time thinking about which is better
+            foreach (KeyValuePair<string, Exline> kvp in Funcs)
+            {
+                context.DefineFuncFromExline(kvp.Key, kvp.Value);
+            }
             //LibraryUtility.DefaultInject(this, context, asname);
         }
     }

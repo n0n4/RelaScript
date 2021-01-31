@@ -45,6 +45,7 @@ namespace RelaScript.Libraries.Basics
             "f:sec",
             "f:csc",
             "f:cas",
+            "f:sinc",
             // hyperbolic
             "f:asinh",
             "f:acosh",
@@ -244,6 +245,10 @@ namespace RelaScript.Libraries.Basics
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Cas",
                         new[] { typeof(double) }),
                         ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
+                case "f:sinc":
+                    return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Sinc",
+                        new[] { typeof(double) }),
+                        ExFuncs.GetArgAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
                 // hyperbolic
                 case "f:asinh":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Asinh",
@@ -297,7 +302,7 @@ namespace RelaScript.Libraries.Basics
                 case "f:clausen":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Clausen",
                         new[] { typeof(double[]) }),
-                        ExFuncs.GetArgsAsDouble(ExFuncs.GetArgIndex(argexp, 0)));
+                        ExFuncs.GetArgsAsDouble(argexp));
                 case "f:cycloid":
                     return Expression.Call(Expression.Constant(this), this.GetType().GetRuntimeMethod("Cycloid",
                         new[] { typeof(double), typeof(double) }),
@@ -586,6 +591,14 @@ namespace RelaScript.Libraries.Basics
         {
             return Math.Sqrt(2) * Math.Sin(x + (Math.PI / 4));
         }
+
+        public double Sinc(double x)
+        {
+            if (x == 0.0)
+                return 1.0;
+
+            return Sin(x) / x;
+        }
         #endregion Trigonometric
 
         #region Hyperbolic
@@ -656,8 +669,8 @@ namespace RelaScript.Libraries.Basics
             double sum = 0;
             while (k < maxk)
             {
-                sum += Math.Sin(k * x) / Math.Pow(k, z);
                 k++;
+                sum += Math.Sin(k * x) / Math.Pow(k, z);
             }
             return sum;
         }

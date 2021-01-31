@@ -467,6 +467,14 @@ namespace RelaScript
             }
         }
 
+        public void CopyFuncs(InputLibrary target)
+        {
+            foreach (var kvp in Funcs)
+            {
+                target.Funcs.Add(kvp.Key, kvp.Value);
+            }
+        }
+
         public int PushArg(string name)
         {
             ArgList.Add(name);
