@@ -58,13 +58,7 @@ RelaScript files are saved with the .rela extension. If you install our VSCode e
 - More documentation to come on our Wiki.
   
 # TODO
-- Still missing a few crucial array support features, like index assignment (`v:arr[1] = 5`) and a make-function (`f:array(10)`)
 - The basic libraries are missing many essential functions
 - Support for writing libraries in RelaScript is incomplete
 - The compiler needs to output more descriptive errors
 - Type safety mechanics are under consideration
-
-
-(WIP: samples to come)
-
-(WIP: notable TODOs / gaps)
